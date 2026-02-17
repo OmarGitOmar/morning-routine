@@ -1,0 +1,131 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Morning OS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: radial-gradient(circle at top, #1f1c2c, #0f0c29);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+            overflow: hidden;
+        }
+        .card {
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(20px);
+            padding: 40px;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 420px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+        h1 {
+            font-size: 18px;
+            letter-spacing: 2px;
+            opacity: 0.8;
+            margin-bottom: 10px;
+        }
+        #streak {
+            font-size: 14px;
+            margin-bottom: 15px;
+            opacity: 0.8;
+        }
+        #timer {
+            font-size: 72px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        .checklist {
+            text-align: left;
+            margin-top: 20px;
+        }
+        .checklist label {
+            display: block;
+            margin: 12px 0;
+            cursor: pointer;
+        }
+        input[type="checkbox"] {
+            margin-right: 10px;
+            transform: scale(1.3);
+        }
+        .complete {
+            color: #00ffae;
+            font-weight: bold;
+            margin-top: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h1>WIN THE FIRST 15 MINUTES</h1>
+    <div id="streak">🔥 0 Day Streak</div>
+    <div id="timer">15:00</div>
+
+    <div class="checklist">
+        <label><input type="checkbox"> No Snooze</label>
+        <label><input type="checkbox"> Light</label>
+        <label><input type="checkbox"> Move</label>
+        <label><input type="checkbox"> Hydrate</label>
+        <label><input type="checkbox"> Plan Top 3</label>
+    </div>
+
+    <div class="complete" id="completeMsg">You won today.</div>
+</div>
+
+<script>
+let time = 900;
+let timerDisplay = document.getElementById("timer");
+let streakDisplay = document.getElementById("streak");
+let completeMsg = document.getElementById("completeMsg");
+
+let today = new Date().toDateString();
+let savedDate = localStorage.getItem("lastCompletedDate");
+let streak = parseInt(localStorage.getItem("streak") || "0");
+
+if (savedDate && savedDate !== today) {
+    let yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    if (savedDate !== yesterday.toDateString()) {
+        streak = 0;
+        localStorage.setItem("streak", "0");
+    }
+}
+
+streakDisplay.innerText = "🔥 " + streak + " Day Streak";
+
+function startTimer() {
+    let interval = setInterval(() => {
+        if (time <= 0) {
+            clearInterval(interval);
+            completeMsg.style.display = "block";
+            if (savedDate !== today) {
+                streak++;
+                localStorage.setItem("streak", streak);
+                localStorage.setItem("lastCompletedDate", today);
+            }
+            streakDisplay.innerText = "🔥 " + streak + " Day Streak";
+            return;
+        }
+        time--;
+        let minutes = Math.floor(time / 60);
+        let seconds = time % 60;
+        timerDisplay.innerText =
+            (minutes < 10 ? "0" : "") + minutes + ":" +
+            (seconds < 10 ? "0" : "") + seconds;
+    }, 1000);
+}
+
+startTimer(); // Auto-start on load
+</script>
+
+</body>
+</html>
